@@ -1,0 +1,35 @@
+services:
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    tty: true
+    command: ["ollama", "run", "llama3:8b"]
+    restart: unless-stopped
+
+  tts:
+    image: ghcr.io/coqui-ai/tts:latest
+    ports:
+      - "5002:5002"
+    volumes:
+      - ./data:/data
+    command: ["tts-server", "--model_name", "tts_models/en/ljspeech/tacotron2-DDC"]
+    restart: unless-stopped
+
+  api:
+    build: ./app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - ollama
+      - tts
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+volumes:
+  ollama-models:
