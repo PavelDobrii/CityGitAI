@@ -18,6 +18,9 @@ services:
     volumes:
       - ./piper/models:/piper/models
       - ./data:/app/data
+    environment:
+      - OUTPUT_DIR=/app/data/output
+      - OLLAMA_URL=http://ollama:11434
     depends_on:
       - ollama
     restart: unless-stopped
