@@ -17,13 +17,14 @@ from googletrans import Translator
 translator = Translator()
 
 app = FastAPI()
-OUTPUT_DIR = "data/output"
+OUTPUT_DIR = os.getenv("OUTPUT_DIR", "data/output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 class StoryRequest(BaseModel):
     topic: str
     style: str = "neutral"
     lang: str = "en"  # "en" или "ru"
+    voice: str | None = None  # путь к модели голоса Piper
 
 def get_wikipedia_summary(topic, lang='en'):
     wikipedia.set_lang(lang)
@@ -100,12 +101,17 @@ async def generate_story(req: StoryRequest):
     with open(story_path, "w", encoding="utf-8") as f:
         f.write(final_text)
 
-    # 6. Озвучка Piper (укажи путь к модели и data-dir по своей структуре!)
-    if req.lang == "ru":
-        model = "/piper/models/piper-voices/ru/ru_RU/ruslan/medium/ru_RU-ruslan-medium.onnx"
-    else:
-        model = "/piper/models/piper-voices/en/en_US/amy/medium/en_US-amy-medium.onnx"
+    # 6. Озвучка Piper
     data_dir = "/piper/models/piper-voices"
+    if req.voice:
+        model = req.voice
+        if not os.path.isabs(model):
+            model = os.path.join(data_dir, model)
+    else:
+        if req.lang == "ru":
+            model = os.path.join(data_dir, "ru/ru_RU/ruslan/medium/ru_RU-ruslan-medium.onnx")
+        else:
+            model = os.path.join(data_dir, "en/en_US/amy/medium/en_US-amy-medium.onnx")
     audio_path = os.path.join(OUTPUT_DIR, f"{story_id}.wav")
 
     try:
