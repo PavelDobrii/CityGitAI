@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    tty: true
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./piper/models:/piper/models
+      - ./data:/app/data
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+volumes:
+  ollama-models:

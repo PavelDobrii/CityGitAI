@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+wikipedia
+requests
+beautifulsoup4
+googletrans==4.0.0-rc1
+piper-tts==1.2.0
+numpy
+torch
