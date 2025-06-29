@@ -111,7 +111,7 @@ CityGitAI/
 Установите зависимости и выполните:
 
 ```bash
-pip install -r app/requirements.txt
+pip install -r app/requirements.txt  # теперь список включает httpx
 pytest
 ```
 
